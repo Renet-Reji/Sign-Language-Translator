@@ -32,7 +32,7 @@ signenv\Scripts\activate
 - Installations 
 
 ```bash
-pip install opencv-python mediapipe numpy pandas scikit-learn
+pip install opencv-python mediapipe==0.10.10 numpy pandas scikit-learn
 ```
 
 ### Step 5 
