@@ -11,6 +11,19 @@ import joblib
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 recognizer = cv.face.LBPHFaceRecognizer_create() 
+
+# Create columns and name 
+columns = []
+for i in range(21):
+    columns += [f"x{i}", f"y{i}"]
+columns.append("label")
+
+os.makedirs('Model', exist_ok=True)
+csv_path = 'Model/asl_data.csv'
+
+# Save to CSV 
+df = pd.DataFrame(columns=columns)
+df.to_csv(csv_path, index=False)
 database = 'Dataset' 
 
 walk_result = list(os.walk(database))
@@ -22,7 +35,6 @@ for item in walk_result :
     folder.append(folder_path) 
 
 folder = folder[1:]
-data = []
 count = 0
 
 for path in folder : 
@@ -47,26 +59,20 @@ for path in folder :
                         row.append(lm.x)
                         row.append(lm.y)
 
-                    row.append(label) 
-                    data.append(row)
+                    row.append(label)
+
+                    # Write row to csv 
+                    df_row = pd.DataFrame([row], columns=columns) 
+                    df_row.to_csv(csv_path, mode='a', header=False, index=False)
+
     print(f'{label} processing completed')
+    # count += 1
+    # if count > 5 : 
+    #     break 
     
-print(data)
-
-# Create columns and name 
-columns = []
-for i in range(21):
-    columns += [f"x{i}", f"y{i}"]
-columns.append("label")
-
-df = pd.DataFrame(data=data, columns=columns) 
-
-# Save to CSV 
-os.makedirs('Model', exist_ok=True)
-df.to_csv('Model/asl_data.csv', index=False) 
 print('CSV Created as asl_data.csv')
 # Load Data 
-data = pd.read_csv('./Model/asl_data.csv')
+data = pd.read_csv(csv_path)
 
 # Encode the labels 
 encoder = LabelEncoder() 

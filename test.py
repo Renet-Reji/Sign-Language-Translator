@@ -1,5 +1,4 @@
 # Test Model 
-
 import cv2 as cv 
 import mediapipe as mp 
 import joblib
@@ -14,8 +13,8 @@ with mp_hands.Hands(max_num_hands=1) as hands :
         ret, frame = cam.read() 
         frame = cv.flip(frame, 1) 
 
-        frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)  
-        # frame = cv.cvtColor(frame, cv.COLOR_RGB2BGR)
+        # frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)  
+        frame = cv.cvtColor(frame, cv.COLOR_RGB2BGR)
         result = hands.process(frame) 
 
         if result.multi_hand_landmarks : 
