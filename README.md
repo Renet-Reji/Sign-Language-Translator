@@ -43,7 +43,7 @@ pip install opencv-python mediapipe==0.10.10 numpy pandas scikit-learn
 python test.py
 ```
 
-- If model is not trained run train.py
+- If model is not trained, **Add Dataset** in **Dataset** folder run train.py
 
 ```bash 
 python train.py
