@@ -2,8 +2,8 @@
 import cv2 as cv 
 import mediapipe as mp 
 import joblib
-model = joblib.load('./Model/asl_model.pkl')
-encoder = joblib.load('./Model/label_encoder.pkl')
+model = joblib.load('./Model/asl_model2.pkl')
+encoder = joblib.load('./Model/label_encoder2.pkl')
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 cam = cv.VideoCapture(0) 
@@ -11,11 +11,11 @@ cam = cv.VideoCapture(0)
 with mp_hands.Hands(max_num_hands=1) as hands : 
     while True : 
         ret, frame = cam.read() 
-        frame = cv.flip(frame, 1) 
+        # frame = cv.flip(frame, 1) 
 
-        # frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)  
         frame = cv.cvtColor(frame, cv.COLOR_RGB2BGR)
         result = hands.process(frame) 
+        frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)  
 
         if result.multi_hand_landmarks : 
             for hand_landmarks in result.multi_hand_landmarks : 
