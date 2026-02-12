@@ -21,7 +21,7 @@ python -m venv signenv
 ```
 ### Step 3 
 
-- Activate your env 
+- Activate your venv 
 
 ```bash 
 signenv\Scripts\activate
