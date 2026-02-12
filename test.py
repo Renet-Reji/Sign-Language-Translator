@@ -26,7 +26,7 @@ with mp_hands.Hands(max_num_hands=1) as hands :
                     data.append(lm.x) 
                     data.append(lm.y) 
                 
-                input_data = pd.DataFrame([data], columns=model.feature_names_in_)
+                input_data = pd.DataFrame([data], columns=model.feature_names_in_) 
                 prediction = model.predict(input_data)[0]
                 sign = encoder.inverse_transform([prediction])[0]
                 
