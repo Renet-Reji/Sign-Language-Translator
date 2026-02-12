@@ -1,0 +1,16 @@
+# Virtual Environment
+venv/
+
+# Model files
+*.pkl
+
+# Large datasets
+*.csv
+dataset/
+Dataset 2/
+asl_dataset/
+asl_alphabet_train/
+
+# Python cache
+__pycache__/
+*.pyc
