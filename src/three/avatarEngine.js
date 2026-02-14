@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
 import { createScene, handleResize } from "../Components/sceneSetup";
 import { setupControls } from "../Components/controls";
 import { loadAvatar } from "../Components/avatarLoader";
@@ -8,13 +10,25 @@ import { createBoneProxy, runASLSign } from "../Components/aslProxy";
 import { CAMERA_POSITIONS } from "./config";
 import { wordMap } from "../Components/wordMap";
 
+const animationFiles = [
+  "hello",
+  "thanks",
+  "iamfrom",
+  "idle"
+];
 
 export function initAvatar(mountEl, onLoaded) {
+
   let stop = false;
   let isWordPlaying = false;
+  let isArmRaised = false;
 
   const { scene, camera, renderer } = createScene(mountEl);
   const controls = setupControls(camera, renderer.domElement);
+
+  const loader = new GLTFLoader();
+
+  let avatarScene = null;
 
   let realBones = {};
   let boneStates = {};
@@ -30,60 +44,14 @@ export function initAvatar(mountEl, onLoaded) {
 
   const restPose = {};
 
+  const clock = new THREE.Clock();
 
-  loadAvatar(scene, "/t3.glb", (loaderData) => {
-    const {
-      gltf,
-      avatarScene,
-      realBones: rb,
-      boneStates: bs,
-      morphDict,
-    } = loaderData;
-
-    realBones = rb;
-    boneStates = bs;
-
-    boneProxy = createBoneProxy(realBones, boneStates);
-    faceController = new FaceController(morphDict);
-
-    // Capture rest pose
-    for (const name in realBones) {
-      restPose[name] = realBones[name].quaternion.clone();
-    }
-
-    applyArmPose();
-
-    mixer = new THREE.AnimationMixer(avatarScene);
-
-    if (gltf.animations && gltf.animations.length) {
-      gltf.animations.forEach((clip) => {
-        clips[clip.name.toLowerCase()] = clip;
-      });
-
-    } else {
-      console.error("NO ANIMATIONS FOUND IN GLB");
-    }
-
-    if (onLoaded) onLoaded();
-  });
-
-
-  function resetAll() {
-    for (const name in restPose) {
-      const bone = realBones[name];
-      const state = boneStates[name];
-      if (!bone || !state) continue;
-
-      bone.quaternion.copy(restPose[name]);
-      state.currentQ.copy(restPose[name]);
-      state.targetQ.copy(restPose[name]);
-      state.velocity.set(0, 0, 0, 0);
-    }
-  }
 
   function setBoneEuler(name, x, y, z) {
+
     const bone = realBones[name];
     const state = boneStates[name];
+
     if (!bone || !state) return;
 
     const q = new THREE.Quaternion().setFromEuler(
@@ -95,132 +63,314 @@ export function initAvatar(mountEl, onLoaded) {
     );
 
     bone.quaternion.copy(q);
+
     state.currentQ.copy(q);
     state.targetQ.copy(q);
+
     state.velocity.set(0, 0, 0, 0);
+
   }
 
+
   function applyArmPose() {
+
     if (activeSide === "RIGHT") {
+
       setBoneEuler("mixamorig9RightArm", 50, -10, 10);
       setBoneEuler("mixamorig9RightForeArm", 20, 40, -140);
       setBoneEuler("mixamorig9RightHand", -40, -15, -20);
+
     } else {
+
       setBoneEuler("mixamorig9LeftArm", 50, -10, 10);
       setBoneEuler("mixamorig9LeftForeArm", 0, -40, 120);
       setBoneEuler("mixamorig9LeftHand", -20, 10, 0);
+
     }
+
   }
 
 
-  const clock = new THREE.Clock();
+  function resetAll() {
+
+    Object.keys(restPose).forEach(name => {
+
+      const bone = realBones[name];
+      const state = boneStates[name];
+
+      if (!bone || !state) return;
+
+      bone.quaternion.copy(restPose[name]);
+
+      state.currentQ.copy(restPose[name]);
+      state.targetQ.copy(restPose[name]);
+
+      state.velocity.set(0, 0, 0, 0);
+
+    });
+
+    isArmRaised = false;
+
+  }
+
+
+  function loadAnimations(done) {
+
+    let loaded = 0;
+
+    animationFiles.forEach(name => {
+
+      loader.load(`/animations/${name}.glb`, gltf => {
+
+        if (gltf.animations.length > 0) {
+
+          const clip =
+            THREE.AnimationClip.parse(
+              THREE.AnimationClip.toJSON(
+                gltf.animations[0]
+              )
+            );
+
+          clip.name = name;
+
+          clips[name] = clip;
+
+        }
+
+        loaded++;
+
+        if (loaded === animationFiles.length)
+          done();
+
+      });
+
+    });
+
+  }
+
+
+  function playIdle() {
+
+    if (!clips.idle) return;
+
+    mixer.stopAllAction();
+
+    const idle = mixer.clipAction(clips.idle);
+
+    idle.reset();
+    idle.setLoop(THREE.LoopRepeat);
+    idle.play();
+
+  }
+
+
+  loadAvatar(scene, "/avatar.glb", (data) => {
+
+    avatarScene = data.avatarScene;
+
+    realBones = data.realBones;
+    boneStates = data.boneStates;
+
+    boneProxy = createBoneProxy(realBones, boneStates);
+
+    faceController = new FaceController(data.morphDict || {});
+
+    mixer = new THREE.AnimationMixer(avatarScene);
+
+    Object.keys(realBones).forEach(name => {
+
+      restPose[name] =
+        realBones[name].quaternion.clone();
+
+    });
+
+    loadAnimations(() => {
+
+      playIdle();
+
+      if (onLoaded) onLoaded();
+
+    });
+
+  });
+
 
   function animate() {
+
     if (stop) return;
+
     requestAnimationFrame(animate);
 
-    const dt = Math.min(clock.getDelta(), 0.05);
+    const dt = clock.getDelta();
     const now = clock.elapsedTime;
 
-    // ✅ ALWAYS update mixer
-    if (mixer) mixer.update(dt);
+    mixer?.update(dt);
 
-    // Physics only for letters
     if (!isWordPlaying) {
+
       updatePhysics(dt, boneStates, realBones);
+
       updateIdleDrift(now, realBones);
+
+      if (activeSign) {
+
+        runASLSign(
+          activeSign,
+          boneProxy,
+          now - signStartTime,
+          activeSide
+        );
+
+      }
+
     }
 
-    // Face controller unchanged
-    if (faceController) faceController.update(now);
-
-    // Letter ASL only when active
-    if (boneProxy && !isWordPlaying && activeSign) {
-      runASLSign(activeSign, boneProxy, now - signStartTime, activeSide);
-    }
+    faceController?.update(now);
 
     controls.update();
+
     renderer.render(scene, camera);
+
   }
 
   animate();
 
-  const onResize = () => handleResize(mountEl, camera, renderer);
-  window.addEventListener("resize", onResize);
 
-  // =========================
-  // PUBLIC API
-  // =========================
+  window.addEventListener(
+    "resize",
+    () =>
+      handleResize(
+        mountEl,
+        camera,
+        renderer
+      )
+  );
+
+
   return {
-    playSign: (char) => {
+
+    playSign(char) {
+
       if (isWordPlaying) return;
+
+      mixer?.stopAllAction();
+
+      if (!isArmRaised) {
+
+        applyArmPose();
+
+        isArmRaised = true;
+
+      }
+
       activeSign = char.toLowerCase();
+
       signStartTime = clock.elapsedTime;
-      faceController?.triggerViseme(activeSign, signStartTime);
+
+      faceController?.triggerViseme(
+        activeSign,
+        signStartTime
+      );
+
     },
 
 
-    playWord: (input) => {
+    playWord(input) {
+
       if (!mixer) return false;
 
-      const normalized = input.toLowerCase().trim();
+      isArmRaised = false;
 
-      // Resolve alias (handles 2+ words)
-      const mapped = wordMap[normalized] || normalized;
+      const normalized =
+        input.toLowerCase().trim();
+
+      const mapped =
+        wordMap[normalized] || normalized;
 
       const clip = clips[mapped];
+
       if (!clip) return false;
 
       isWordPlaying = true;
+
       activeSign = null;
 
       mixer.stopAllAction();
+
       resetAll();
-      applyArmPose();
 
       const action = mixer.clipAction(clip);
+
       action.reset();
+
       action.setLoop(THREE.LoopOnce);
+
       action.clampWhenFinished = true;
+
       action.play();
 
-      const onFinished = (e) => {
-        if (e.action !== action) return;
-        mixer.removeEventListener("finished", onFinished);
+      mixer.addEventListener(
+        "finished",
+        () => {
 
-        isWordPlaying = false;
+          isWordPlaying = false;
 
-        if (clips["idle"]) {
-          const idle = mixer.clipAction(clips["idle"]);
-          idle.reset();
-          idle.setLoop(THREE.LoopRepeat);
-          idle.play();
-        }
-      };
+          playIdle();
 
-      mixer.addEventListener("finished", onFinished);
+        },
+        { once: true }
+      );
 
       return true;
+
     },
 
-    toggleCameraPosition: () => {
-      activeSide = activeSide === "RIGHT" ? "LEFT" : "RIGHT";
+
+    toggleCameraPosition() {
+
+      activeSide =
+        activeSide === "RIGHT"
+          ? "LEFT"
+          : "RIGHT";
+
       resetAll();
+
       applyArmPose();
 
-      const cfg = CAMERA_POSITIONS[activeSide];
-      controls.target.set(cfg.target.x, cfg.target.y, cfg.target.z);
-      camera.position.set(cfg.camera.x, cfg.camera.y, cfg.camera.z);
+      const cfg =
+        CAMERA_POSITIONS[activeSide];
+
+      camera.position.set(
+        cfg.camera.x,
+        cfg.camera.y,
+        cfg.camera.z
+      );
+
+      controls.target.set(
+        cfg.target.x,
+        cfg.target.y,
+        cfg.target.z
+      );
+
       controls.update();
 
       return activeSide;
+
     },
 
-    dispose: () => {
+
+    dispose() {
+
       stop = true;
-      window.removeEventListener("resize", onResize);
-      controls.dispose();
+
+      mixer?.stopAllAction();
+
       renderer.dispose();
-    },
+
+      controls.dispose();
+
+    }
+
   };
+
 }
