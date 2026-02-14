@@ -14,7 +14,7 @@ export function signU(bones, t = 0, side = "RIGHT") {
 
       // RIGHT ARM (Active)
       
-      r("mixamorig9RightHand", 0, 0, 0); 
+        r("mixamorig9RightHand", -40, -15, -20);
      
       
 

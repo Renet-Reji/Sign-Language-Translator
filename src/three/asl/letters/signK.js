@@ -14,7 +14,7 @@ export function signK(bones, t = 0, side = "RIGHT") {
 
       // RIGHT ARM (Active)
       
-     
+        r("mixamorig9RightHand", -40, -15, -20);
       
 
       r("mixamorig9RightHandIndex1", 0, 0, 0);
