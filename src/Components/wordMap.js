@@ -3,5 +3,8 @@ export const wordMap = {
   "thanks": "thanks",
   "hi": "hello",
   "hello": "hello",
-  "i am from":"iamfrom"
+  "i am from":"iamfrom",
+  "good":"good",
+  "z":"signz",
+  "j":"signj"
 };
