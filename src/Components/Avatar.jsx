@@ -74,6 +74,11 @@ export default function Avatar() {
 
       if (!matched) {
         for (const ch of word) {
+          if (ch === 'z' || ch === "j") {
+            apiRef.current.playWord(ch)
+            await new Promise((r) => setTimeout(r, 1300));
+            continue ;
+          }
           apiRef.current.playSign(ch);
           await new Promise((r) => setTimeout(r, 900));
         }
@@ -169,11 +174,10 @@ export default function Avatar() {
             {wordBuffer.map((word, i) => (
               <span
                 key={i}
-                className={`transition-all duration-300 ${
-                  activeWordIndex === i
-                    ? "text-indigo-600 font-semibold scale-110"
-                    : "text-gray-700 opacity-60"
-                }`}
+                className={`transition-all duration-300 ${activeWordIndex === i
+                  ? "text-indigo-600 font-semibold scale-110"
+                  : "text-gray-700 opacity-60"
+                  }`}
               >
                 {word}
               </span>

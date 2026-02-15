@@ -11,10 +11,8 @@ import { CAMERA_POSITIONS } from "./config";
 import { wordMap } from "../Components/wordMap";
 
 const animationFiles = [
-  "hello",
-  "thanks",
-  "iamfrom",
-  "idle"
+  "hello","thanks","iamfrom",
+  "idle","good","signz","signj"
 ];
 
 export function initAvatar(mountEl, onLoaded) {
@@ -262,7 +260,7 @@ export function initAvatar(mountEl, onLoaded) {
         isArmRaised = true;
 
       }
-
+console.log(char)
       activeSign = char.toLowerCase();
 
       signStartTime = clock.elapsedTime;
