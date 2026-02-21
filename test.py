@@ -1,6 +1,7 @@
 # Test Model 
 import cv2 as cv 
 import mediapipe as mp 
+import pandas as pd 
 import joblib
 model = joblib.load('./Model/asl_model2.pkl')
 encoder = joblib.load('./Model/label_encoder2.pkl')
@@ -25,7 +26,8 @@ with mp_hands.Hands(max_num_hands=1) as hands :
                     data.append(lm.x) 
                     data.append(lm.y) 
                 
-                prediction = model.predict([data])[0]
+                input_data = pd.DataFrame([data], columns=model.feature_names_in_) 
+                prediction = model.predict(input_data)[0]
                 sign = encoder.inverse_transform([prediction])[0]
                 
                 mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
