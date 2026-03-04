@@ -11,8 +11,8 @@ import { CAMERA_POSITIONS } from "./config";
 import { wordMap } from "../Components/wordMap";
 
 const animationFiles = [
-  "hello","thanks","iamfrom",
-  "idle","good","signz","signj"
+  "hello","thanks","iamfrom","father","mother",
+  "idle","good","signz","signj","seeyoulater","me"
 ];
 
 export function initAvatar(mountEl, onLoaded) {
