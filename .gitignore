@@ -1,11 +1,13 @@
 # Virtual Environment
 venv/
+isl/
 
 # Large datasets
 dataset/
 Dataset 2/
 asl_dataset/
 asl_alphabet_train
+ISL_Dataset/
 
 #model files
 *.pkl
@@ -19,7 +21,6 @@ dataset/
 Dataset 2/
 asl_dataset/
 asl_alphabet_train/
->>>>>>> 857c376e9e58ab09a4c4b423abe607438408915f
 
 # Python cache
 __pycache__/
@@ -30,3 +31,4 @@ __pycache__/
 
 temp.py
 *.rar
+*.zip

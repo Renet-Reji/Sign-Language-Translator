@@ -19,7 +19,7 @@ from features import compute_features
 # ----------------------------------------------------------
 # Load trained model
 # ----------------------------------------------------------
-with open("asl_svm_model.pkl", "rb") as f:
+with open(r"Sign-Language-Translator\Renet\ASL Interpreter\asl_svm_model.pkl", "rb") as f:
     model, label_encoder = pickle.load(f)
 
 print("Model expects:", model.named_steps['scaler'].n_features_in_)
