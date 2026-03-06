@@ -19,4 +19,4 @@ pause
 
 echo. 
 echo Running project 
-python app.py
+python server.py

@@ -12,7 +12,7 @@ cam = cv.VideoCapture(0)
 with mp_hands.Hands(max_num_hands=1) as hands : 
     while True : 
         ret, frame = cam.read() 
-        # frame = cv.flip(frame, 1) 
+        # frame = cv.flip(frame, 1)
 
         frame = cv.cvtColor(frame, cv.COLOR_RGB2BGR)
         result = hands.process(frame) 
