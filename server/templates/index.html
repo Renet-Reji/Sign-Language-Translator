@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Translation</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: rgb(73, 255, 240);
+    }
+    nav .heading {
+        text-align: center;
+        color: rgb(81, 81, 255);
+    }
+
+    #output { 
+        font-size: 2rem;
+    }
+
+</style>
+
+<body>
+    <nav>
+        <h1 class="heading">
+            This is home page
+        </h1>
+
+    </nav>
+
+    <div class="camContainer">
+        <video id="video" autoplay></video>
+        <canvas id="canvas"></canvas>
+        <span id="output">None</span>
+    </div>
+</body>
+
+<!-- Mediapipe Script -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</html>
