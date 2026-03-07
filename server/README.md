@@ -14,9 +14,10 @@ cd Sign-Language-Translator
 
 ### Step 2
 
-- Open `Command Prompt` in parent folder and run this command
+- Open `Command Prompt`  and run this command
 
 ```bash 
+cd server
 setup.bat
 ```
 
