@@ -35,7 +35,7 @@ function App() {
                 {isOpen && <Camera />}
 
                 <div>
-                    <button onClick={handleCamera}>
+                    <button className="text-2xl" onClick={handleCamera}>
                         Click to {isOpen ? 'Close' : 'Open'}
                     </button>
                 </div>
