@@ -11,7 +11,6 @@ encoder = joblib.load('./Model/label_encoder2.pkl')
 
 @app.route('/')
 def home() : 
-    print('Hello world')
     return 'Hello world'
 
 @app.route('/predict', methods=['post'])
