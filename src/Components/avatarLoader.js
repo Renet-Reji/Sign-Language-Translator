@@ -1,7 +1,7 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from "three";
 
-export function loadAvatar(scene, modelUrl, onLoaded) {
+export function loadAvatar(scene, modelUrl, onLoaded, onProgress) {
   const loader = new GLTFLoader();
 
   const realBones = {};
@@ -15,7 +15,23 @@ export function loadAvatar(scene, modelUrl, onLoaded) {
       console.log("Avatar GLB Loaded Successfully");
 
       const avatar = gltf.scene;
-      scene.add(avatar);
+
+      // Wrap avatar in a pivot Group centered at world origin.
+      // We MUST rotate the GROUP, not the avatar directly, so the pivot
+      // is always exactly at (0,0,0) — which is where the camera points.
+      const pivotGroup = new THREE.Group();
+      scene.add(pivotGroup);
+      pivotGroup.add(avatar);
+
+      // Compute bounding box and offset avatar INSIDE the group so its
+      // horizontal center aligns with the group's origin (0,0,0).
+      // The group itself never moves — only avatar shifts inside it.
+      const box    = new THREE.Box3().setFromObject(avatar);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      avatar.position.x -= center.x;
+      avatar.position.z -= center.z;
+      // Y: don't shift vertically so feet stay grounded
 
       avatar.traverse((obj) => {
         if (obj.isMesh) {
@@ -44,11 +60,12 @@ export function loadAvatar(scene, modelUrl, onLoaded) {
         }
       });
 
-      // ✅ PASS EVERYTHING THROUGH THE CALLBACK (THIS IS THE FIX)
+      // ✅ Return the pivotGroup as avatarScene so controls rotate the group
+      // (which pivots at world origin), not the inner avatar mesh.
       if (onLoaded) {
         onLoaded({
           gltf,
-          avatarScene: avatar,
+          avatarScene: pivotGroup,
           realBones,
           boneStates,
           morphTargets,
@@ -56,7 +73,11 @@ export function loadAvatar(scene, modelUrl, onLoaded) {
         });
       }
     },
-    undefined,
+    (xhr) => {
+      if (onProgress && xhr.lengthComputable) {
+        onProgress((xhr.loaded / xhr.total) * 100);
+      }
+    },
     (err) => console.error("Error loading GLB:", err)
   );
 }

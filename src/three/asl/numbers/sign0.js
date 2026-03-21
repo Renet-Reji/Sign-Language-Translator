@@ -29,6 +29,8 @@ export function sign0(bones, t = 0, side = "RIGHT") {
       r("mixamorig9RightHandPinky1", 45, 0, 0);
       r("mixamorig9RightHandPinky2", 45, 0, 0);
       r("mixamorig9RightHandPinky3", 30, 0, 0);
+      r("mixamorig9RightHandThumb1", 55, 0, 0);
+      r("mixamorig9RightHandThumb2", -20, 0, 0);
   } else {
 
       // LEFT ARM (Active)
@@ -46,5 +48,7 @@ export function sign0(bones, t = 0, side = "RIGHT") {
       r("mixamorig9LeftHandPinky1", 45, 0, 0);
       r("mixamorig9LeftHandPinky2", 45, 0, 0);
       r("mixamorig9LeftHandPinky3", 30, 0, 0);
+      r("mixamorig9LeftHandThumb1", 55, 0, 0);
+      r("mixamorig9LeftHandThumb2", -20, 0, 0);
   }
 }

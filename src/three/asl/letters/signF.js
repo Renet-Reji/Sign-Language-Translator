@@ -15,24 +15,26 @@ export function signF(bones, t = 0, side = "RIGHT") {
     // RIGHT ARM (Active)
 
 
-      r("mixamorig9RightHand", -40, -15, -20);
+    r("mixamorig9RightHand", -40, -15, -20);
 
 
-    r("mixamorig9RightHandIndex1", 35, -15, 0);
-    r("mixamorig9RightHandIndex2", 45, -10, 0);
-    r("mixamorig9RightHandIndex3", 30, -5, 0);
+
+    r("mixamorig9RightHandIndex1", 55, 0, 0);
+    r("mixamorig9RightHandIndex2", 55, 0, 0);
+    r("mixamorig9RightHandIndex3", 45, 0, 0);
 
 
-    r("mixamorig9RightHandThumb1", 60, -50, 0);
-    r("mixamorig9RightHandThumb2", 15, 0, 0);
 
-    r("mixamorig9RightHandMiddle1", 0, 0, 0);
+    r("mixamorig9RightHandThumb1", 60, 20, 0);
+    r("mixamorig9RightHandThumb2", -35, 0, 0);
+
+    r("mixamorig9RightHandMiddle1", 30, 0, 0);
     r("mixamorig9RightHandMiddle2", 0, 0, 0);
     r("mixamorig9RightHandMiddle3", 0, 0, 0);
     r("mixamorig9RightHandRing1", 0, 0, 0);
     r("mixamorig9RightHandRing2", 0, 0, 0);
     r("mixamorig9RightHandRing3", 0, 0, 0);
-    r("mixamorig9RightHandPinky1", 0, 0, 0);
+    r("mixamorig9RightHandPinky1", 0, 0, 10);
     r("mixamorig9RightHandPinky2", 0, 0, 0);
     r("mixamorig9RightHandPinky3", 0, 0, 0);
 
