@@ -17,15 +17,21 @@ export default function Avatar() {
   const recognitionRef = useRef(null);
   const isPlayingRef = useRef(false);
 
+  const [loadProgress, setLoadProgress] = useState(0);
+
   useEffect(() => {
     if (!mountRef.current) return;
 
-    apiRef.current = initAvatar(mountRef.current, () => {
-      setLoaded(true);
-      setTimeout(() => {
-        apiRef.current?.focusASL?.();
-      }, 200);
-    });
+    apiRef.current = initAvatar(
+      mountRef.current, 
+      () => {
+        setLoaded(true);
+        setTimeout(() => {
+          apiRef.current?.focusASL?.();
+        }, 200);
+      },
+      (progress) => setLoadProgress(Math.floor(progress))
+    );
 
     return () => {
       apiRef.current?.dispose?.();
@@ -53,19 +59,22 @@ export default function Avatar() {
         return updated.slice(-5);
       });
 
-      setActiveWordIndex((prev) => {
-        return Math.min(4, wordBuffer.length);
-      });
+      setActiveWordIndex(Math.min(4, wordBuffer.length));
+
+      // Insert a rest-pose pause between consecutive words
+      if (i > 0) {
+        apiRef.current.insertWordPause?.();
+      }
 
       let matched = false;
 
+      // Try longest phrase match first (up to 3 words)
       for (let len = 3; len > 0; len--) {
         if (i + len > words.length) continue;
 
         const phrase = words.slice(i, i + len).join(" ");
 
         if (apiRef.current.playWord?.(phrase)) {
-          await new Promise((r) => setTimeout(r, 1300));
           i += len - 1;
           matched = true;
           break;
@@ -73,16 +82,19 @@ export default function Avatar() {
       }
 
       if (!matched) {
+        // Finger-spell each character; 'j' and 'z' use GLB clips
         for (const ch of word) {
-          if (ch === 'z' || ch === "j") {
-            apiRef.current.playWord(ch)
-            await new Promise((r) => setTimeout(r, 1300));
-            continue ;
+          if (ch === "z" || ch === "j") {
+            apiRef.current.playWord(ch);
+          } else {
+            apiRef.current.playSign(ch);
           }
-          apiRef.current.playSign(ch);
-          await new Promise((r) => setTimeout(r, 900));
         }
       }
+
+      // Wait for the engine's queue to fully drain this word before
+      // moving on — no more timeout guessing
+      await apiRef.current.waitForQueue?.();
     }
 
     setActiveWordIndex(null);
@@ -134,7 +146,7 @@ export default function Avatar() {
   }, [start]);
 
   const chars = [
-    ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
+    ..."ABCDEFGHIKLMNOPQRSTUVWXY".split(""),
     ..."0123456789".split(""),
   ];
 
@@ -153,9 +165,18 @@ export default function Avatar() {
       <div ref={mountRef} className="w-full h-full absolute inset-0 z-0" />
 
       {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50 backdrop-blur-sm">
-          <div className="text-xl font-semibold text-gray-800 animate-pulse">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 z-50 backdrop-blur-sm">
+          <div className="text-xl font-semibold text-gray-800 mb-4 animate-pulse">
             Loading Avatar...
+          </div>
+          <div className="w-64 h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+            <div 
+              className="h-full bg-indigo-500 transition-all duration-300 ease-out"
+              style={{ width: `${loadProgress}%` }}
+            ></div>
+          </div>
+          <div className="mt-2 text-sm text-gray-600 font-medium">
+            {loadProgress}%
           </div>
         </div>
       )}
@@ -184,12 +205,7 @@ export default function Avatar() {
             ))}
           </div>
 
-          <button
-            onClick={handleToggleCamera}
-            className="text-xs font-medium text-white bg-indigo-500 hover:bg-indigo-600 px-3 py-1 rounded-full transition-colors shadow-sm"
-          >
-            {cameraSide} View
-          </button>
+          
         </div>
 
         <div className="flex gap-2 justify-center">

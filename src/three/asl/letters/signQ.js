@@ -12,42 +12,41 @@ export function signQ(bones, t = 0, side = "RIGHT") {
 
   if (side === "RIGHT") {
 
-      // RIGHT ARM (Active)
-      
-     
-        r("mixamorig9RightHand", -40, -15, -20);
-      
+    // RIGHT ARM (Active)
 
-      r("mixamorig9RightHandIndex1", 90, 0, 0);
-      r("mixamorig9RightHandIndex2", 100, 0, 0);
-      r("mixamorig9RightHandIndex3", 80, 0, 0);
-      r("mixamorig9RightHandMiddle1", 90, 0, 0);
-      r("mixamorig9RightHandMiddle2", 100, 0, 0);
-      r("mixamorig9RightHandMiddle3", 80, 0, 0);
-      r("mixamorig9RightHandRing1", 90, 0, 0);
-      r("mixamorig9RightHandRing2", 100, 0, 0);
-      r("mixamorig9RightHandRing3", 80, 0, 0);
-      r("mixamorig9RightHandPinky1", 90, 0, 0);
-      r("mixamorig9RightHandPinky2", 100, 0, 0);
-      r("mixamorig9RightHandPinky3", 80, 0, 0);
-      r("mixamorig9RightHandThumb1", 25, 35, 15);
+   r("mixamorig9RightHand", 90, 10, 110);
+
+    r("mixamorig9RightHandIndex1", 10, 0, 0);
+    r("mixamorig9RightHandIndex2", 20, 0, 0);
+    r("mixamorig9RightHandIndex3", 10, 0, 0);
+    r("mixamorig9RightHandMiddle1", 90, 0, 0);
+    r("mixamorig9RightHandMiddle2", 90, 0, 0);
+    r("mixamorig9RightHandMiddle3", 80, 0, 0);
+    r("mixamorig9RightHandRing1", 90, 0, 0);
+    r("mixamorig9RightHandRing2", 90, 0, 0);
+    r("mixamorig9RightHandRing3", 80, 0, 0);
+    r("mixamorig9RightHandPinky1", 90, 0, 0);
+    r("mixamorig9RightHandPinky2", 90, 0, 0);
+    r("mixamorig9RightHandPinky3", 80, 0, 0);
+    r("mixamorig9RightHandThumb1", 10, 0, -30);
+    r("mixamorig9RightHandThumb2", 0, 0, 0);
   } else {
 
-      // LEFT ARM (Active)
-      
+    // LEFT ARM (Active)
 
-      r("mixamorig9LeftHandIndex1", 90, 0, 0);
-      r("mixamorig9LeftHandIndex2", 100, 0, 0);
-      r("mixamorig9LeftHandIndex3", 80, 0, 0);
-      r("mixamorig9LeftHandMiddle1", 90, 0, 0);
-      r("mixamorig9LeftHandMiddle2", 100, 0, 0);
-      r("mixamorig9LeftHandMiddle3", 80, 0, 0);
-      r("mixamorig9LeftHandRing1", 90, 0, 0);
-      r("mixamorig9LeftHandRing2", 100, 0, 0);
-      r("mixamorig9LeftHandRing3", 80, 0, 0);
-      r("mixamorig9LeftHandPinky1", 90, 0, 0);
-      r("mixamorig9LeftHandPinky2", 100, 0, 0);
-      r("mixamorig9LeftHandPinky3", 80, 0, 0);
-      r("mixamorig9LeftHandThumb1", 25, -35, -15);
+
+    r("mixamorig9LeftHandIndex1", 90, 0, 0);
+    r("mixamorig9LeftHandIndex2", 100, 0, 0);
+    r("mixamorig9LeftHandIndex3", 80, 0, 0);
+    r("mixamorig9LeftHandMiddle1", 90, 0, 0);
+    r("mixamorig9LeftHandMiddle2", 100, 0, 0);
+    r("mixamorig9LeftHandMiddle3", 80, 0, 0);
+    r("mixamorig9LeftHandRing1", 90, 0, 0);
+    r("mixamorig9LeftHandRing2", 100, 0, 0);
+    r("mixamorig9LeftHandRing3", 80, 0, 0);
+    r("mixamorig9LeftHandPinky1", 90, 0, 0);
+    r("mixamorig9LeftHandPinky2", 100, 0, 0);
+    r("mixamorig9LeftHandPinky3", 80, 0, 0);
+    r("mixamorig9LeftHandThumb1", 25, -35, -15);
   }
 }

@@ -19,21 +19,6 @@ const r = (bones, name, x, y, z) => {
     }
 };
 
-// netral by default
-export function resetHand(bones) {
-    const fingers = [
-        "Index1", "Index2", "Index3",
-        "Middle1", "Middle2", "Middle3",
-        "Ring1", "Ring2", "Ring3",
-        "Pinky1", "Pinky2", "Pinky3",
-        "Thumb1", "Thumb2", "Thumb3"
-    ];
-
-    fingers.forEach(f => {
-        r(bones, `mixamorig9LeftHand${f}`, 0, 0, 0);
-        r(bones, `mixamorig9RightHand${f}`, 0, 0, 0);
-    });
-}
 
 const signs = {
     // Letters

@@ -63,11 +63,13 @@ export function updatePhysics(dt, boneStates, realBones) {
 export function updateIdleDrift(now, realBones) {
     const headBone = realBones["mixamorig9Head"] || realBones["Head"];
     if (headBone) {
+        // Compute a fresh sway value each frame from sin/cos — purely oscillating.
+        // Use .copy() NOT .multiply() so rotation is SET each frame, never accumulated.
         const swayY = Math.sin(now * 0.4) * 0.05 + Math.sin(now * 1.5) * 0.01;
         const swayX = Math.cos(now * 0.3) * 0.03 + Math.cos(now * 1.2) * 0.01;
         const noiseQ = new THREE.Quaternion().setFromEuler(
             new THREE.Euler(swayX, swayY, 0)
         );
-        headBone.quaternion.multiply(noiseQ);
+        headBone.quaternion.copy(noiseQ);
     }
 }

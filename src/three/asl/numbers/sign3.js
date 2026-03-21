@@ -30,6 +30,7 @@ export function sign3(bones, t = 0, side = "RIGHT") {
       r("mixamorig9RightHandPinky2", 100, 0, 0);
       r("mixamorig9RightHandPinky3", 80, 0, 0);
       r("mixamorig9RightHandThumb1", 0, 50, 0);
+      r("mixamorig9RightHandThumb2", 0, 0, 0);
   } else {
 
       // LEFT ARM (Active)
@@ -48,5 +49,6 @@ export function sign3(bones, t = 0, side = "RIGHT") {
       r("mixamorig9LeftHandPinky2", 100, 0, 0);
       r("mixamorig9LeftHandPinky3", 80, 0, 0);
       r("mixamorig9LeftHandThumb1", 0, -50, 0);
+      r("mixamorig9LeftHandThumb2", 0, 0, 0);
   }
 }

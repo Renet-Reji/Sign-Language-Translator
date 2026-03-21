@@ -13,30 +13,22 @@ export function signD(bones, t = 0, side = "RIGHT") {
   if (side === "RIGHT") {
 
     // RIGHT ARM (Active)
-
-
-
-    r("mixamorig9RightHand", 0, -120, 10);
-
+    r("mixamorig9RightHand", -20, -30, -10);
 
     r("mixamorig9RightHandIndex1", 0, 0, 0);
     r("mixamorig9RightHandIndex2", 0, 0, 0);
     r("mixamorig9RightHandIndex3", 0, 0, 0);
-
-    r("mixamorig9RightHandMiddle1", 55, 0, 0);
-    r("mixamorig9RightHandMiddle2", 65, 0, 0);
-    r("mixamorig9RightHandMiddle3", 40, 0, 0);
-
-    r("mixamorig9RightHandRing1", 60, 0, 0);
-    r("mixamorig9RightHandRing2", 65, 0, 0);
-    r("mixamorig9RightHandRing3", 40, 0, 0);
-
-    r("mixamorig9RightHandPinky1", 65, 0, 0);
-    r("mixamorig9RightHandPinky2", 70, 0, 0);
-    r("mixamorig9RightHandPinky3", 45, 0, 0);
-
-    r("mixamorig9RightHandThumb1", 25, 25, 10);
-    r("mixamorig9RightHandThumb2", 35, 0, 0);
+    r("mixamorig9RightHandMiddle1", 45, 0, 0);
+    r("mixamorig9RightHandMiddle2", 45, 0, 0);
+    r("mixamorig9RightHandMiddle3", 25, 0, 0);
+    r("mixamorig9RightHandRing1", 45, 0, 0);
+    r("mixamorig9RightHandRing2", 45, 0, 0);
+    r("mixamorig9RightHandRing3", 30, 0, 0);
+    r("mixamorig9RightHandPinky1", 45, 0, 0);
+    r("mixamorig9RightHandPinky2", 45, 0, 0);
+    r("mixamorig9RightHandPinky3", 30, 0, 0);
+    r("mixamorig9RightHandThumb1", 60, 20, 0);
+    r("mixamorig9RightHandThumb2", -35, 0, 0);
   } else {
 
     // LEFT ARM (Active)

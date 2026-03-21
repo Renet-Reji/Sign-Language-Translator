@@ -6,5 +6,10 @@ export const wordMap = {
   "i am from":"iamfrom",
   "good":"good",
   "z":"signz",
-  "j":"signj"
+  "j":"signj",
+  "see you later":"seeyoulater",
+  "me":"me",
+  "i":"me",
+  "father":"father",
+  "mother":"mother",
 };
