@@ -44,7 +44,9 @@ export default function Camera({ onLetterPredict }) {
             } catch (err) {
                 console.error("Error accessing camera:", err)
             }
-        }
+        }    
+
+        
 
         function detectFrame() {
             if (!isRunning) return;
