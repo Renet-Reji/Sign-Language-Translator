@@ -26,10 +26,10 @@ export function sign6(bones, t = 0) {
       r("mixamorig9RightHandRing1", 0, 0, 0);
       r("mixamorig9RightHandRing2", 0, 0, 0);
       r("mixamorig9RightHandRing3", 0, 0, 0);
-      r("mixamorig9RightHandPinky1", 45, 0, 0);
+      r("mixamorig9RightHandPinky1", 75,70, 0);
       r("mixamorig9RightHandPinky2", 45, 0, 0);
       r("mixamorig9RightHandPinky3", 30, 0, 0);
-      r("mixamorig9RightHandThumb1", 55, 0, 0);
+      r("mixamorig9RightHandThumb1", 65, 0, 0);
       r("mixamorig9RightHandThumb2", -20, 0, 0);
   
 }

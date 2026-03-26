@@ -29,7 +29,7 @@ export function sign5(bones, t = 0) {
       r("mixamorig9RightHandPinky1", 0, 0, 0);
       r("mixamorig9RightHandPinky2", 0, 0, 0);
       r("mixamorig9RightHandPinky3", 0, 0, 0);
-      r("mixamorig9RightHandThumb1", 0, 0, 0);
+      r("mixamorig9RightHandThumb1", 0, 0, -50);
       r("mixamorig9RightHandThumb2", 0, 0, 0);
   
 }

@@ -6,7 +6,7 @@ export default function Avatar() {
   const apiRef = useRef(null);
   const inputRef = useRef(null);
 
-const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [start, setStart] = useState(false);
 
@@ -22,7 +22,7 @@ const [loaded, setLoaded] = useState(false);
     if (!mountRef.current) return;
 
     apiRef.current = initAvatar(
-      mountRef.current, 
+      mountRef.current,
       () => {
         setLoaded(true);
         setTimeout(() => {
@@ -144,90 +144,84 @@ const [loaded, setLoaded] = useState(false);
     };
   }, [start]);
 
-  const chars = [
-    ..."ABCDEFGHIKLMNOPQRSTUVWXY".split(""),
-    ..."0123456789".split(""),
-  ];
 
-  const handleSign = (char) => {
-    apiRef.current?.playSign(char);
-  };
 
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 overflow-hidden relative">
-      <div ref={mountRef} className="w-full h-full absolute inset-0 z-0" />
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-white font-['Inter'] overflow-hidden relative">
+      
+      {/* Background Aesthetic Glow for Avatar Contrast */}
+      <div className="absolute top-[10%] left-[10%] w-[50%] h-[50%] bg-cyan-600/25 rounded-full blur-[120px] pointer-events-none z-0"></div>
+      <div className="absolute bottom-[20%] right-[10%] w-[40%] h-[40%] bg-blue-600/25 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+      <div ref={mountRef} className="w-full h-full absolute inset-0 z-0 bg-transparent" />
 
       {!loaded && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 z-50 backdrop-blur-sm">
-          <div className="text-xl font-semibold text-gray-800 mb-4 animate-pulse">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a]/80 z-50 backdrop-blur-md">
+          <div className="text-xl font-semibold tracking-wider text-gray-300 mb-6 animate-pulse uppercase">
             Loading Avatar...
           </div>
-          <div className="w-64 h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner">
-            <div 
-              className="h-full bg-indigo-500 transition-all duration-300 ease-out"
+          <div className="w-64 h-2 bg-[#111] rounded-full overflow-hidden shadow-inner border border-white/5">
+            <div
+              className="h-full bg-blue-500 transition-all duration-300 ease-out"
               style={{ width: `${loadProgress}%` }}
             ></div>
           </div>
-          <div className="mt-2 text-sm text-gray-600 font-medium">
+          <div className="mt-4 text-xs text-gray-500 tracking-widest font-medium">
             {loadProgress}%
           </div>
         </div>
       )}
 
-      <div className="absolute bottom-6 mx-auto z-10 w-[95%] md:w-[90%] max-w-4xl p-4 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40 shadow-xl flex flex-col gap-4 transition-all hover:bg-white/40">
-        <div className="flex items-center justify-between px-2">
+      <div className="absolute bottom-6 mx-auto z-10 w-[95%] md:w-[90%] max-w-4xl p-6 rounded-[2rem] bg-[#111]/80 backdrop-blur-xl border border-white/10 shadow-[0_20px_60px_-15px_rgba(59,130,246,0.3)] flex flex-col gap-6 transition-all hover:bg-[#111]/90">
+        
+        <div className="flex flex-col md:flex-row items-center justify-between px-2 gap-4 md:gap-0">
           <button
             disabled={!speechSupported}
             onClick={() => setStart(!start)}
-            className="py-2 text-sm font-medium bg-indigo-500 hover:bg-indigo-600 rounded-full text-white w-20 disabled:opacity-40"
+            className={`py-2.5 px-6 text-sm font-semibold tracking-wide rounded-full transition-all duration-300 border disabled:opacity-40 flex items-center justify-center gap-2 ${
+              start 
+                ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
+                : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 hover:bg-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
+            }`}
           >
-            {start ? "Stop" : "Start"}
+            <div className={`w-2 h-2 rounded-full ${start ? 'bg-red-500 animate-pulse' : 'bg-cyan-400'}`}></div>
+            {start ? "Stop Mic" : "Start Mic"}
           </button>
 
-          <div className="flex gap-2 justify-center text-sm font-medium">
+          <div className="flex gap-3 justify-center text-sm font-medium items-center p-3 rounded-2xl bg-black/40 border border-white/5 min-w-[200px] h-[48px]">
+            {wordBuffer.length === 0 && (
+               <span className="text-gray-500 opacity-60 tracking-[0.2em] text-[10px] uppercase font-semibold">Awaiting Input</span>
+            )}
             {wordBuffer.map((word, i) => (
               <span
                 key={i}
-                className={`transition-all duration-300 ${activeWordIndex === i
-                  ? "text-indigo-600 font-semibold scale-110"
-                  : "text-gray-700 opacity-60"
+                className={`transition-all duration-300 tracking-wide ${activeWordIndex === i
+                  ? "text-blue-400 font-bold scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                  : "text-gray-500 opacity-60"
                   }`}
               >
                 {word}
               </span>
             ))}
           </div>
-
-          
         </div>
 
-        <div className="flex gap-2 justify-center">
+        <div className="flex gap-3 justify-center w-full">
           <input
             ref={inputRef}
             type="text"
-            placeholder="Enter text to sign"
-            className="px-4 py-2 rounded-lg border border-gray-300 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Type your message to sign..."
+            className="px-6 py-3.5 rounded-full bg-black/60 border border-white/10 text-gray-200 w-full max-w-md focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-gray-600 transition-all shadow-inner font-light tracking-wide text-sm md:text-base"
           />
           <button
             onClick={() => playText(inputRef.current.value)}
-            className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition"
+            className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold tracking-wide rounded-full hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:scale-105 active:scale-95 transition-all duration-300"
           >
-            Sign
+            Translate
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2 justify-center max-h-[35vh] overflow-y-auto p-1">
-          {chars.map((char) => (
-            <button
-              key={char}
-              onClick={() => handleSign(char)}
-              className="w-12 h-12 sm:w-10 sm:h-10 rounded-xl bg-white/60 hover:bg-[#4f46e5] hover:text-white text-gray-700 font-bold shadow-sm transition-all duration-200 flex items-center justify-center border border-white/50 active:scale-95 text-lg"
-            >
-              {char}
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );

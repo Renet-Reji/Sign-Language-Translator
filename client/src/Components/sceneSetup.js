@@ -1,56 +1,30 @@
 import * as THREE from "three";
 
-// ── Avatar framing ───────────────────────────────────────────────────────────
-//
-// The camera LOOKS AT the avatar's chest/sternum area.
-// The camera itself is placed LOWER (near waist height) so it tilts upward,
-// naturally placing the head in the upper portion of the frame.
-//
-// Avatar approximate heights (Mixamo T-pose, no scale):
-//   Top of head  ≈ 1.85 m
-//   Chin         ≈ 1.70 m
-//   Sternum      ≈ 1.45 m   ← lookAt target
-//   Navel        ≈ 1.05 m   ← camera Y (slightly lower than target)
-//   Feet         ≈ 0.00 m
+export const LOOK_AT = new THREE.Vector3(0, 1.45, 0);
 
-export const LOOK_AT = new THREE.Vector3(0, 1.45, 0); // sternum / upper chest
+const CAM_Y = 2.05;
 
-// Camera Y — placed lower than LOOK_AT so camera tilts up and head is in frame
-const CAM_Y = 1.05;
-
-/**
- * Responsive camera distance.
- *
- * The viewport on this machine is ~1536×729 (large widescreen laptop).
- * We use camZ to control how far back the camera sits.
- * A larger camZ = more of the avatar visible (zoom out).
- */
 function computeCameraParams(width, height) {
     let camZ;
     let fovDeg;
 
     if (width >= 1400) {
-        // Large desktop / widescreen — needs most zoom-out
-        camZ   = 2.8;
+        camZ = 2.4;
         fovDeg = 38;
     } else if (width >= 1024) {
-        // Standard desktop
-        camZ   = 2.4;
+        camZ = 2.1;
         fovDeg = 38;
     } else if (width >= 640) {
-        // Tablet
-        camZ   = 2.2;
+        camZ = 1.9;
         fovDeg = 40;
     } else {
-        // Mobile
-        camZ   = 2.6;
+        camZ = 2.1;
         fovDeg = 44;
     }
 
-    // Extra pullback for portrait viewports (tall & narrow)
     const aspect = width / height;
     if (aspect < 0.75) {
-        camZ   += 0.4;
+        camZ += 0.4;
         fovDeg += 4;
     }
 
@@ -61,20 +35,16 @@ export function createScene(mountEl) {
     const W = mountEl.clientWidth;
     const H = mountEl.clientHeight;
 
-    // ── Scene ──────────────────────────────────────────────────────────────
     const scene = new THREE.Scene();
     scene.background = null;
 
-    // ── Camera ─────────────────────────────────────────────────────────────
     const { camZ, fovDeg } = computeCameraParams(W, H);
 
     const camera = new THREE.PerspectiveCamera(fovDeg, W / H, 0.1, 1000);
 
-    // Camera sits LOWER than LOOK_AT so it tilts upward — head in top of frame.
     camera.position.set(0, CAM_Y, camZ);
     camera.lookAt(LOOK_AT);
 
-    // ── Renderer ───────────────────────────────────────────────────────────
     const renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true,
@@ -87,25 +57,33 @@ export function createScene(mountEl) {
     mountEl.innerHTML = "";
     mountEl.appendChild(renderer.domElement);
 
-    renderer.domElement.style.width       = "100%";
-    renderer.domElement.style.height      = "100%";
-    renderer.domElement.style.display     = "block";
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
+    renderer.domElement.style.display = "block";
     renderer.domElement.style.touchAction = "none";
 
-    // ── Lights ─────────────────────────────────────────────────────────────
-    scene.add(new THREE.AmbientLight(0xffffff, 1.1));
+    // ── Studio Lighting for Dark Theme ─────────────────────────────────────────
+    // Boosted ambient to guarantee no muddy shadows on the shirt/hands
+    scene.add(new THREE.AmbientLight(0xffffff, 2.5));
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.8);
-    key.position.set(2, 4, 3);
-    key.castShadow = true;
+    // Strong front/right Key Light to highlight skin tones
+    const key = new THREE.DirectionalLight(0xffffff, 3.5);
+    key.position.set(1, 3, 5);
     scene.add(key);
 
-    const fill = new THREE.DirectionalLight(0xeef2ff, 1.0);
-    fill.position.set(-2, 1, 2);
+    // Direct front fill to wash over chest and hands vividly
+    const front = new THREE.DirectionalLight(0xeef2ff, 2.0);
+    front.position.set(0, 1.5, 5);
+    scene.add(front);
+
+    // Side fill with a cyan tint to match aesthetic and create edge contrast 
+    const fill = new THREE.DirectionalLight(0x22d3ee, 1.8);
+    fill.position.set(-3, 1.5, 3);
     scene.add(fill);
 
-    const rim = new THREE.DirectionalLight(0xffffff, 1.5);
-    rim.position.set(0, 4, -4);
+    // Intense rim light from behind to cut the dark avatar out from the black background
+    const rim = new THREE.DirectionalLight(0xffffff, 4.0);
+    rim.position.set(0, 3, -5);
     scene.add(rim);
 
     return { scene, camera, renderer };
@@ -119,7 +97,7 @@ export function handleResize(mountEl, camera, renderer) {
 
     const { camZ, fovDeg } = computeCameraParams(W, H);
 
-    camera.fov    = fovDeg;
+    camera.fov = fovDeg;
     camera.aspect = W / H;
     camera.position.set(0, CAM_Y, camZ);
     camera.lookAt(LOOK_AT);
