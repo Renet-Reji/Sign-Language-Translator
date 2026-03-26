@@ -1,108 +1,157 @@
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision'
 import axios from 'axios'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 
-export default function Camera() {
+export default function Camera({ onLetterPredict }) {
+    const videoRef = useRef(null)
+    const canvasRef = useRef(null)
+
     useEffect(() => {
+        let stream = null;
+        let animationFrameId = null;
+        let handLandmarker = null;
+        let isRunning = true;
+
         async function createHandLandmarker() {
-            const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm")
+            try {
+                const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm")
 
-            handLandmarker = await HandLandmarker.createFromOptions(vision, {
-                baseOptions: {
-                    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task"
-                },
-                runningMode: 'VIDEO',
-                numHands: 1
-            })
+                if (!isRunning) return;
+                handLandmarker = await HandLandmarker.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task"
+                    },
+                    runningMode: 'VIDEO',
+                    numHands: 1
+                })
 
-            startCamera()
+                if (isRunning) startCamera()
+            } catch (err) {
+                console.error("Error creating HandLandmarker:", err)
+            }
         }
 
         async function startCamera() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-            videoRef.current.srcObject = stream
-            videoRef.current.play()
-
-            videoRef.current.onloadeddata = () => detectFrame()
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true })
+                if (videoRef.current && isRunning) {
+                    videoRef.current.srcObject = stream
+                    videoRef.current.play()
+                    videoRef.current.onloadeddata = () => {
+                        if (isRunning) detectFrame()
+                    }
+                }
+            } catch (err) {
+                console.error("Error accessing camera:", err)
+            }
         }
 
         function detectFrame() {
+            if (!isRunning) return;
             const video = videoRef.current
             const canvas = canvasRef.current
+            if (!video || !canvas) return;
+
             const ctx = canvas.getContext('2d')
 
-            canvas.width = video.videoWidth
-            canvas.height = video.videoHeight
-
             async function frameLoop() {
-                const results = handLandmarker.detectForVideo(
-                    video,
-                    performance.now()
-                )
+                if (!isRunning || !video || !canvas) return;
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                if (video.videoWidth > 0 && video.videoHeight > 0) {
+                    canvas.width = video.videoWidth
+                    canvas.height = video.videoHeight
 
-                if (results.landmarks) {
-                    results.landmarks.forEach((landmarks) => {
-                        landmarks.forEach((point) => {
-                            ctx.beginPath();
-                            ctx.arc(
-                                point.x * canvas.width,
-                                point.y * canvas.height,
-                                5,
-                                0,
-                                2 * Math.PI
-                            );
-                            ctx.fillStyle = "red";
-                            ctx.fill();
-                        });
+                    if (video.readyState >= 2 && handLandmarker) {
+                        try {
+                            const results = handLandmarker.detectForVideo(
+                                video,
+                                performance.now()
+                            )
 
-                        // 🔥 HERE YOU CAN EXTRACT LANDMARK DATA
-                        const extracted = [];
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                        results.landmarks[0].forEach(point => {
-                            extracted.push(point.x);
-                            extracted.push(point.y);
-                        });
+                            if (results.landmarks && results.landmarks.length > 0) {
+                                results.landmarks.forEach((landmarks) => {
+                                    landmarks.forEach((point) => {
+                                        ctx.beginPath();
+                                        ctx.arc(
+                                            point.x * canvas.width,
+                                            point.y * canvas.height,
+                                            6,
+                                            0,
+                                            2 * Math.PI
+                                        );
+                                        ctx.fillStyle = "#00f3ff"; // Neon cyan
+                                        ctx.shadowColor = "#00f3ff";
+                                        ctx.shadowBlur = 10;
+                                        ctx.fill();
+                                    });
 
-                        axios({
-                            method: 'POST',
-                            url: 'http://127.0.0.1:5000/predict',
-                            // url: '/',
-                            data: { landmarks: extracted }
-                        })
-                            .then((res) => {
-                                console.log('res :>> ', res);
-                                setLetter(res?.data?.prediction)
-                            })
-                            .catch((err) => {
-                                // console.log('err :>> ', err);
-                            })
-                    });
+                                    // Extract landmark data
+                                    const extracted = [];
+                                    landmarks.forEach(point => {
+                                        extracted.push(point.x);
+                                        extracted.push(point.y);
+                                    });
+
+                                    axios({
+                                        method: 'POST',
+                                        url: 'http://127.0.0.1:5000/predict',
+                                        data: { landmarks: extracted }
+                                    })
+                                        .then((res) => {
+                                            if (isRunning && onLetterPredict) {
+                                                onLetterPredict(res?.data?.prediction)
+                                            }
+                                        })
+                                        .catch((err) => {
+                                            // Handle error
+                                        })
+                                });
+                            }
+                        } catch (err) {
+                            console.error("Error detecting landmarks:", err)
+                        }
+                    }
                 }
-                requestAnimationFrame(frameLoop);
-
+                if (isRunning) {
+                    animationFrameId = requestAnimationFrame(frameLoop);
+                }
             }
             frameLoop();
         }
 
-
         createHandLandmarker()
-    }, [])
 
-    const [letter, setLetter] = useState('')
-    const videoRef = useRef(null)
-    const canvasRef = useRef(null)
-    let handLandmarker = null
+        return () => {
+            isRunning = false;
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            if (handLandmarker) {
+                handLandmarker.close();
+            }
+        };
+    }, []) // eslint-disable-line
 
     return (
-        <div>
-            <video ref={videoRef} />
-            <div>
-                Precition: {letter}
-            </div>
-            <canvas ref={canvasRef} />
+        <div className="relative w-full h-full flex items-center justify-center bg-transparent rounded-3xl overflow-hidden shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
+            {/* Real-time Video layer underneath */}
+            <video 
+                ref={videoRef} 
+                autoPlay 
+                playsInline 
+                className="absolute w-full h-full object-cover rounded-3xl" 
+                style={{ transform: 'scaleX(-1)' }} 
+            />
+            <canvas 
+                ref={canvasRef} 
+                className="absolute w-full h-full object-cover z-10 pointer-events-none rounded-3xl" 
+                style={{ transform: 'scaleX(-1)' }}
+            />
         </div>
     )
 }
