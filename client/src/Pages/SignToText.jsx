@@ -45,6 +45,8 @@ export default function SignToText() {
                         </div>
                     )}
 
+                    
+
                     <button 
                         onClick={() => {
                             setIsOpen(!isOpen)
