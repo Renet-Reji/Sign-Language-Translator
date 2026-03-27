@@ -6,8 +6,8 @@ from flask_cors import CORS
 app = Flask(__name__) 
 CORS(app)
 
-model = joblib.load('./Model/asl_model3.pkl')
-encoder = joblib.load('./Model/label_encoder3.pkl')
+model = joblib.load('./Model/asl_model4.pkl')
+encoder = joblib.load('./Model/label_encoder4.pkl')
 
 @app.route('/')
 def home() : 
