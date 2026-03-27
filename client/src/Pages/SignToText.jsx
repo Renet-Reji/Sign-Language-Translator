@@ -4,6 +4,7 @@ import Camera from '../Components/Camera'
 export default function SignToText() {
     const [isOpen, setIsOpen] = useState(false)
     const [currentLetter, setCurrentLetter] = useState('')
+    const [displayLetter, setDisplayLetter] = useState('')
     const [word, setWord] = useState('')
     const [animationKey, setAnimationKey] = useState(0)
     const scrollRef = useRef(null)
@@ -12,7 +13,16 @@ export default function SignToText() {
         if (!letter) return;
         if (letter !== currentLetter) {
             setCurrentLetter(letter);
-            setAnimationKey(prev => prev + 1); 
+            setAnimationKey(prev => prev + 1);
+
+            // Show a visual indicator for special gestures
+            if (letter === 'space') {
+                setDisplayLetter('␣');
+            } else if (letter === 'del') {
+                setDisplayLetter('⌫');
+            } else {
+                setDisplayLetter(letter);
+            }
         }
     }
 
@@ -20,26 +30,17 @@ export default function SignToText() {
         if (!currentLetter || !isOpen) return;
         
         const timeout = setTimeout(() => {
-             setWord(prev => {
-                if (prev.slice(-1) !== currentLetter) {
-                    return prev + currentLetter;
-                }
-                return prev;
-             });
+            if (currentLetter === 'space') {
+                setWord(prev => prev + ' ');
+            } else if (currentLetter === 'del') {
+                setWord(prev => prev.slice(0, -1));
+            } else {
+                setWord(prev => prev + currentLetter);
+            }
         }, 1000); 
 
         return () => clearTimeout(timeout);
     }, [currentLetter, isOpen]);
-
-    useEffect(() => {
-        if (!word || word.endsWith(' ') || !isOpen) return;
-
-        const spaceTimeout = setTimeout(() => {
-            setWord(prev => prev + ' ');
-        }, 2000);
-
-        return () => clearTimeout(spaceTimeout);
-    }, [word, isOpen]);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -112,7 +113,7 @@ export default function SignToText() {
                             key={animationKey}
                             className="text-[8rem] md:text-[14rem] font-bold text-transparent bg-clip-text bg-gradient-to-br from-cyan-400 to-blue-600 block leading-none transition-all duration-300"
                         >
-                            {currentLetter}
+                            {displayLetter}
                         </span>
                     </div>
                 </div>
