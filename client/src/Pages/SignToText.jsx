@@ -37,7 +37,7 @@ export default function SignToText() {
             } else {
                 setWord(prev => prev + currentLetter);
             }
-        }, 1000); 
+        }, 2000); 
 
         return () => clearTimeout(timeout);
     }, [currentLetter, isOpen]);
