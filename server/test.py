@@ -3,8 +3,8 @@ import cv2 as cv
 import mediapipe as mp 
 import pandas as pd 
 import joblib
-model = joblib.load('./Model/asl_model3.pkl')
-encoder = joblib.load('./Model/label_encoder3.pkl')
+model = joblib.load('./Model/asl_model4.pkl')
+encoder = joblib.load('./Model/label_encoder4.pkl')
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 cam = cv.VideoCapture(0) 

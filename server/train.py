@@ -19,7 +19,7 @@ for i in range(21):
 columns.append("label")
 
 os.makedirs('Model', exist_ok=True)
-csv_path = 'Model/asl_data3.csv'
+csv_path = 'Model/asl_data4.csv'
 
 # Save to CSV 
 df = pd.DataFrame(columns=columns)
@@ -96,7 +96,7 @@ accuracy = model.score(X_test, y_test)
 print(f'Accuracy: {accuracy * 100}%') 
 
 # Save the model 
-joblib.dump(model, 'Model/asl_model3.pkl')
-joblib.dump(encoder, 'Model/label_encoder3.pkl')
+joblib.dump(model, 'Model/asl_model4.pkl')
+joblib.dump(encoder, 'Model/label_encoder4.pkl')
 
 print('Model and encoder saved!')
