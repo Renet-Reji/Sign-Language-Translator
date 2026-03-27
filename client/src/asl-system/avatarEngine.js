@@ -1,15 +1,13 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-
 import { createScene, handleResize, LOOK_AT } from "../Components/sceneSetup";
 import { setupControls } from "../Components/controls";
 import { loadAvatar } from "../Components/avatarLoader";
 import { updatePhysics, updateIdleDrift } from "../Components/physics";
-import { FaceController } from "../Components/facialAnimation";
 import { createBoneProxy, runASLSign } from "../Components/aslProxy";
 import { wordMap } from "../Components/wordMap";
 
-const SIGN_HOLD_MS   = 700;
+const SIGN_HOLD_MS   = 800;
 const WORD_PAUSE_MS  = 400; 
 const WORD_ANIM_MS   = 1300;
 
@@ -32,24 +30,15 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
   let realBones      = {};
   let boneStates     = {};
   let boneProxy      = null;
-  let faceController = null;
   let mixer          = null;
   const clips        = {};
 
-
   const restPose = {};
-
   const clock = new THREE.Clock();
 
-  // ── sign queue ─────────────────────────────────────────────────────────────
-  // Each entry is one of:
-  //   { type: "letter", char: "a" }
-  //   { type: "word",   key:  "hello" }   – pre-matched GLB clip key
-  //   { type: "pause" }                   – inter-word rest-pose gap
+  // Animation Queue Management
   const signQueue = [];
-
-  // State of the sign currently being displayed
-  let currentSign = null;   // null | { type, char/key, startTime, durationMs }
+  let currentSign = null;
 
   function enqueueLetter(char) {
     signQueue.push({ type: "letter", char: char.toLowerCase() });
@@ -63,16 +52,13 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
     signQueue.push({ type: "pause" });
   }
 
-  // Dequeue and begin the next item (called once the previous item is done)
+  // Process the next animation in queue
   function advanceQueue() {
     currentSign = null;
 
     if (signQueue.length === 0) {
-      // Queue drained – go back to idle
       isArmRaised = false;
-      if (!isWordPlaying) {
-        playIdle();
-      }
+      if (!isWordPlaying) playIdle();
       return;
     }
 
@@ -80,7 +66,6 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
     const now  = clock.elapsedTime;
 
     if (item.type === "letter") {
-      // Raise arm on first letter if needed
       if (!isArmRaised) {
         mixer?.stopAllAction();
         applyArmPose();
@@ -94,10 +79,7 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
         durationMs: SIGN_HOLD_MS,
       };
 
-      faceController?.triggerViseme(item.char, now);
-
     } else if (item.type === "word") {
-      // Word animation – hand the mixer for a GLB clip
       isArmRaised = false;
       mixer?.stopAllAction();
       resetAll();
@@ -119,7 +101,7 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
         advanceQueue();
       }, { once: true });
 
-      return; // advanceQueue will be called via the "finished" event
+      return;
 
     } else if (item.type === "pause") {
       isArmRaised = false;
@@ -128,28 +110,21 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
     }
   }
 
-  // Called every frame to check if the current sign has expired
   function tickQueue(now) {
     if (currentSign === null) {
-      // Nothing playing – try to pop next item
-      if (signQueue.length > 0) {
-        advanceQueue();
-      }
+      if (signQueue.length > 0) advanceQueue();
       return;
     }
 
-    if (currentSign.type === "word") {
-      return;
-    }
+    if (currentSign.type === "word") return;
 
     const elapsedMs = (now - currentSign.startTime) * 1000;
-
     if (elapsedMs >= currentSign.durationMs) {
       advanceQueue();
     }
   }
 
-
+  // Bone rotation helper
   function setBoneEuler(name, x, y, z) {
     const bone  = realBones[name];
     const state = boneStates[name];
@@ -193,6 +168,7 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
     return clip;
   }
 
+  // Load GLB animations
   function loadAnimations(done) {
     let loaded = 0;
     animationFiles.forEach(name =>
@@ -218,15 +194,14 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
     idle.play();
   }
 
-
+  // Initialize Avatar
   loadAvatar(scene, "/avatar.glb", (data) => {
     avatarScene = data.avatarScene;
     realBones   = data.realBones;
     boneStates  = data.boneStates;
     boneProxy   = createBoneProxy(realBones, boneStates);
 
-    faceController = new FaceController(data.morphDict || {});
-    mixer          = new THREE.AnimationMixer(avatarScene);
+    mixer = new THREE.AnimationMixer(avatarScene);
 
     Object.keys(realBones).forEach(name => {
       restPose[name] = realBones[name].quaternion.clone();
@@ -238,7 +213,7 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
     });
   }, onProgress);
 
-
+  // Main Render Loop
   function animate() {
     if (stop) return;
     requestAnimationFrame(animate);
@@ -258,10 +233,7 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
       }
     }
 
-    // Advance the queue every frame
     tickQueue(now);
-
-    faceController?.update(now);
     controls.update();
     camera.lookAt(LOOK_AT);
     renderer.render(scene, camera);
@@ -271,15 +243,10 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
 
   window.addEventListener("resize", () => handleResize(mountEl, camera, renderer));
 
-
   return {
-
- 
     playSign(char) {
       enqueueLetter(char);
     },
-
-
 
     playWord(input) {
       if (!mixer) return false;
@@ -311,17 +278,11 @@ export function initAvatar(mountEl, onLoaded, onProgress) {
       });
     },
 
-
-
-
-
     dispose() {
       stop = true;
       mixer?.stopAllAction();
       renderer.dispose();
       controls.dispose();
     }
-
   };
-
 }

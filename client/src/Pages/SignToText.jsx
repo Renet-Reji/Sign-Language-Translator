@@ -53,8 +53,10 @@ export default function SignToText() {
     return (
         <div className="flex flex-col md:flex-row h-dvh w-full bg-[#0a0a0a] text-white font-['Inter'] overflow-hidden">
             
-            <div className="w-full md:w-[70%] h-[50vh] md:h-dvh p-2 md:p-8 flex flex-col justify-center relative">
-                <div className="w-full h-full md:h-[90%] relative bg-gray-900 rounded-3xl md:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 flex items-center justify-center overflow-hidden transition-all duration-500">
+            <div className="w-full md:w-[70%] h-[55vh] md:h-dvh p-4 md:p-8 flex flex-col justify-center relative">
+                
+                {/* Camera View */}
+                <div className="w-full flex-1 md:flex-none md:h-[90%] relative bg-gray-900 rounded-3xl md:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 flex items-center justify-center overflow-hidden transition-all duration-500">
                     
                     {isOpen ? (
                         <Camera onLetterPredict={handleNewLetter} />
@@ -64,21 +66,40 @@ export default function SignToText() {
                             <p className="text-lg md:text-xl tracking-widest uppercase font-light">Camera Offline</p>
                         </div>
                     )}
+                    
+                    {/* Desktop Toggle */}
                     <button 
                         onClick={() => {
                             setIsOpen(!isOpen)
                             if (isOpen) { setCurrentLetter(''); setWord(''); }
                         }}
-                        className={`absolute bottom-4 right-4 md:bottom-8 md:right-8 backdrop-blur-md px-6 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-base font-semibold tracking-wide transition-all duration-300 shadow-2xl flex items-center gap-2 md:gap-3 border ${
+                        className={`hidden md:flex absolute bottom-8 right-8 backdrop-blur-md px-8 py-4 rounded-full text-base font-semibold tracking-wide transition-all duration-300 shadow-2xl items-center gap-3 border ${
                             isOpen 
                             ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' 
                             : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 hover:bg-cyan-500/20'
                         }`}
                     >
-                        <div className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full ${isOpen ? 'bg-red-500 animate-pulse' : 'bg-cyan-500'}`}></div>
+                        <div className={`w-2.5 h-2.5 rounded-full ${isOpen ? 'bg-red-500 animate-pulse' : 'bg-cyan-500'}`}></div>
                         {isOpen ? 'Stop Camera' : 'Start Camera'}
                     </button>
                 </div>
+
+                {/* Mobile Toggle */}
+                <button 
+                    onClick={() => {
+                        setIsOpen(!isOpen)
+                        if (isOpen) { setCurrentLetter(''); setWord(''); }
+                    }}
+                    className={`md:hidden mt-4 w-full flex justify-center backdrop-blur-md px-6 py-3.5 rounded-2xl text-sm font-semibold tracking-wide transition-all duration-300 shadow-lg items-center gap-2 border ${
+                        isOpen 
+                        ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' 
+                        : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 hover:bg-cyan-500/20'
+                    }`}
+                >
+                    <div className={`w-2 h-2 rounded-full ${isOpen ? 'bg-red-500 animate-pulse' : 'bg-cyan-500'}`}></div>
+                    {isOpen ? 'Stop Camera' : 'Start Camera'}
+                </button>
+                
             </div>
 
             <div className="w-full md:w-[30%] h-[50vh] md:h-screen bg-black border-t md:border-t-0 md:border-l border-white/5 p-4 md:p-8 flex flex-col items-center relative">

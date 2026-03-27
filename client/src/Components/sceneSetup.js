@@ -62,26 +62,21 @@ export function createScene(mountEl) {
     renderer.domElement.style.display = "block";
     renderer.domElement.style.touchAction = "none";
 
-    // ── Studio Lighting for Dark Theme ─────────────────────────────────────────
-    // Boosted ambient to guarantee no muddy shadows on the shirt/hands
+    // Studio Lighting
     scene.add(new THREE.AmbientLight(0xffffff, 2.5));
 
-    // Strong front/right Key Light to highlight skin tones
     const key = new THREE.DirectionalLight(0xffffff, 3.5);
     key.position.set(1, 3, 5);
     scene.add(key);
 
-    // Direct front fill to wash over chest and hands vividly
     const front = new THREE.DirectionalLight(0xeef2ff, 2.0);
     front.position.set(0, 1.5, 5);
     scene.add(front);
 
-    // Side fill with a cyan tint to match aesthetic and create edge contrast 
     const fill = new THREE.DirectionalLight(0x22d3ee, 1.8);
     fill.position.set(-3, 1.5, 3);
     scene.add(fill);
 
-    // Intense rim light from behind to cut the dark avatar out from the black background
     const rim = new THREE.DirectionalLight(0xffffff, 4.0);
     rim.position.set(0, 3, -5);
     scene.add(rim);

@@ -10,9 +10,6 @@ export default function Avatar() {
   const [speechSupported, setSpeechSupported] = useState(false);
   const [start, setStart] = useState(false);
 
-  const [wordBuffer, setWordBuffer] = useState([]);
-  const [activeWordIndex, setActiveWordIndex] = useState(null);
-
   const recognitionRef = useRef(null);
   const isPlayingRef = useRef(false);
 
@@ -53,21 +50,14 @@ export default function Avatar() {
     for (let i = 0; i < words.length; i++) {
       const word = words[i];
 
-      setWordBuffer((prev) => {
-        const updated = [...prev, word];
-        return updated.slice(-5);
-      });
-
-      setActiveWordIndex(Math.min(4, wordBuffer.length));
-
-      // Insert a rest-pose pause between consecutive words
+      // Word pause
       if (i > 0) {
         apiRef.current.insertWordPause?.();
       }
 
       let matched = false;
 
-      // Try longest phrase match first (up to 3 words)
+      // Phrase matching
       for (let len = 3; len > 0; len--) {
         if (i + len > words.length) continue;
 
@@ -81,7 +71,7 @@ export default function Avatar() {
       }
 
       if (!matched) {
-        // Finger-spell each character; 'j' and 'z' use GLB clips
+        // Character spelling
         for (const ch of word) {
           if (ch === "z" || ch === "j") {
             apiRef.current.playWord(ch);
@@ -91,12 +81,10 @@ export default function Avatar() {
         }
       }
 
-      // Wait for the engine's queue to fully drain this word before
-      // moving on — no more timeout guessing
+      // Wait for animation queue
       await apiRef.current.waitForQueue?.();
     }
 
-    setActiveWordIndex(null);
     isPlayingRef.current = false;
   };
 
@@ -150,7 +138,7 @@ export default function Avatar() {
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-white font-['Inter'] overflow-hidden relative">
       
-      {/* Background Aesthetic Glow for Avatar Contrast */}
+      {/* Background Orbs */}
       <div className="absolute top-[10%] left-[10%] w-[50%] h-[50%] bg-cyan-600/25 rounded-full blur-[120px] pointer-events-none z-0"></div>
       <div className="absolute bottom-[20%] right-[10%] w-[40%] h-[40%] bg-blue-600/25 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
@@ -175,7 +163,7 @@ export default function Avatar() {
 
       <div className="absolute bottom-6 mx-auto z-10 w-[95%] md:w-[90%] max-w-4xl p-6 rounded-[2rem] bg-[#111]/80 backdrop-blur-xl border border-white/10 shadow-[0_20px_60px_-15px_rgba(59,130,246,0.3)] flex flex-col gap-6 transition-all hover:bg-[#111]/90">
         
-        <div className="flex flex-col md:flex-row items-center justify-between px-2 gap-4 md:gap-0">
+        <div className="flex flex-col items-center justify-center px-2">
           <button
             disabled={!speechSupported}
             onClick={() => setStart(!start)}
@@ -188,23 +176,6 @@ export default function Avatar() {
             <div className={`w-2 h-2 rounded-full ${start ? 'bg-red-500 animate-pulse' : 'bg-cyan-400'}`}></div>
             {start ? "Stop Mic" : "Start Mic"}
           </button>
-
-          <div className="flex gap-3 justify-center text-sm font-medium items-center p-3 rounded-2xl bg-black/40 border border-white/5 min-w-[200px] h-[48px]">
-            {wordBuffer.length === 0 && (
-               <span className="text-gray-500 opacity-60 tracking-[0.2em] text-[10px] uppercase font-semibold">Awaiting Input</span>
-            )}
-            {wordBuffer.map((word, i) => (
-              <span
-                key={i}
-                className={`transition-all duration-300 tracking-wide ${activeWordIndex === i
-                  ? "text-blue-400 font-bold scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
-                  : "text-gray-500 opacity-60"
-                  }`}
-              >
-                {word}
-              </span>
-            ))}
-          </div>
         </div>
 
         <div className="flex gap-3 justify-center w-full">
