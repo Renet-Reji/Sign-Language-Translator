@@ -1,5 +1,5 @@
 import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision'
-import axios from 'axios'
+import axiosInstance from '../Config/axiosInstance'
 import React, { useEffect, useRef } from 'react'
 
 export default function Camera({ onLetterPredict }) {
@@ -96,9 +96,9 @@ export default function Camera({ onLetterPredict }) {
                                         extracted.push(point.y);
                                     });
 
-                                    axios({
-                                        method: 'POST',
-                                        url: 'http://127.0.0.1:5000/predict',
+                                    axiosInstance({
+                                        method: 'post',
+                                        url: '/predict',
                                         data: { landmarks: extracted }
                                     })
                                         .then((res) => {
