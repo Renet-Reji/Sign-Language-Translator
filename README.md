@@ -125,7 +125,7 @@ pip install -r requirements.txt
 ### 🔹 Train the Model (Optional)
 
 ```bash
-python train_model.py
+python train.py
 ```
 
 ---
@@ -133,7 +133,7 @@ python train_model.py
 ### 🔹 Run Backend (Flask Server)
 
 ```bash
-python app.py
+python server.py
 ```
 
 ---
