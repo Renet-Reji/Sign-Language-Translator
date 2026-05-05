@@ -10,7 +10,7 @@ call signvenv\Scripts\activate
 echo.
 echo Installing Dependencies 
 echo Please wait......
-pip install -r requirements.txt
+pip install -r requirements1.txt
 
 echo.
 echo Dependencies installed successfully 
