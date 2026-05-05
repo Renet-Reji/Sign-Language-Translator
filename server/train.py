@@ -9,8 +9,8 @@ from sklearn.svm import SVC
 import joblib
 
 mp_hands = mp.solutions.hands
-mp_drawing = mp.solutions.drawing_utils
-recognizer = cv.face.LBPHFaceRecognizer_create() 
+# mp_drawing = mp.solutions.drawing_utils
+# recognizer = cv.face.LBPHFaceRecognizer_create() 
 
 # Create columns and name 
 columns = []
