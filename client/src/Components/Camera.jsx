@@ -22,7 +22,7 @@ export default function Camera({ onLetterPredict }) {
 
         async function createHandLandmarker() {
             try {
-                const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm")
+                const vision = await FilesetResolver.forVisionTasks( "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm")
 
                 if (!isRunning) return;
                 handLandmarker = await HandLandmarker.createFromOptions(vision, {

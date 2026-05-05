@@ -6,6 +6,7 @@ export default function SignToText() {
     const [currentLetter, setCurrentLetter] = useState('')
     const [displayLetter, setDisplayLetter] = useState('')
     const [word, setWord] = useState('')
+    const [spell, setSpell] = useState('')
     const [animationKey, setAnimationKey] = useState(0)
     const scrollRef = useRef(null)
 
@@ -26,16 +27,31 @@ export default function SignToText() {
         }
     }
 
+    const speakWord = (text) => {
+    if (!text) return;
+
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US';
+    utter.rate = 1.0;
+
+    speechSynthesis.speak(utter);
+};
+
     useEffect(() => {
         if (!currentLetter || !isOpen) return;
         
         const timeout = setTimeout(() => {
             if (currentLetter === 'space') {
+                speakWord(spell); 
                 setWord(prev => prev + ' ');
+                
+                setSpell('')
             } else if (currentLetter === 'del') {
                 setWord(prev => prev.slice(0, -1));
+                setSpell(prev => prev.slice(0, -1))
             } else {
                 setWord(prev => prev + currentLetter);
+                setSpell(prev => prev + currentLetter)
             }
         }, 2000); 
 

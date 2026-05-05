@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { initAvatar } from "../asl-system/avatarEngine";
+import { convertToASL } from "./aslUtils";
 
 export default function Avatar() {
   const mountRef = useRef(null);
@@ -9,6 +10,8 @@ export default function Avatar() {
   const [loaded, setLoaded] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [start, setStart] = useState(false);
+  const [aslMode, setAslMode] = useState(true);
+  const [currentPlaying, setCurrentPlaying] = useState("");
 
   const recognitionRef = useRef(null);
   const isPlayingRef = useRef(false);
@@ -39,7 +42,9 @@ export default function Avatar() {
 
     isPlayingRef.current = true;
 
-    const cleaned = text
+    const processedText = aslMode ? convertToASL(text) : text;
+
+    const cleaned = processedText
       .toLowerCase()
       .replace(/[.,!?;:()[\]{}"'`]/g, "")
       .replace(/\s+/g, " ")
@@ -56,6 +61,7 @@ export default function Avatar() {
       }
 
       let matched = false;
+      let playingText = word;
 
       // Phrase matching
       for (let len = 3; len > 0; len--) {
@@ -64,6 +70,7 @@ export default function Avatar() {
         const phrase = words.slice(i, i + len).join(" ");
 
         if (apiRef.current.playWord?.(phrase)) {
+          playingText = phrase;
           i += len - 1;
           matched = true;
           break;
@@ -81,10 +88,13 @@ export default function Avatar() {
         }
       }
 
+      setCurrentPlaying(playingText.toUpperCase());
+
       // Wait for animation queue
       await apiRef.current.waitForQueue?.();
     }
 
+    setCurrentPlaying("");
     isPlayingRef.current = false;
   };
 
@@ -138,11 +148,36 @@ export default function Avatar() {
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-white font-['Inter'] overflow-hidden relative">
       
-      {/* Background Orbs */}
+    
       <div className="absolute top-[10%] left-[10%] w-[50%] h-[50%] bg-cyan-600/25 rounded-full blur-[120px] pointer-events-none z-0"></div>
       <div className="absolute bottom-[20%] right-[10%] w-[40%] h-[40%] bg-blue-600/25 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
       <div ref={mountRef} className="w-full h-full absolute inset-0 z-0 bg-transparent" />
+
+      <div 
+        className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-in-out flex items-center justify-center gap-3 px-6 py-2.5 rounded-full border shadow-2xl backdrop-blur-md ${
+          currentPlaying 
+            ? 'opacity-100 translate-y-0 bg-cyan-900/40 border-cyan-500/50 scale-100' 
+            : 'opacity-0 -translate-y-4 bg-transparent border-transparent scale-95 pointer-events-none'
+        }`}
+      >
+        <span className="text-sm font-semibold tracking-[0.2em] text-cyan-50 uppercase">
+          {currentPlaying || "WAITING"}
+        </span>
+      </div>
+
+  
+      <button 
+        onClick={() => setAslMode(!aslMode)}
+        className={`absolute top-6 left-6 md:top-8 md:left-8 z-50 w-[50px] h-[50px] rounded-full flex flex-col  border-2 border-white/20 items-center justify-center font-bold tracking-wider transition-all duration-300 shadow-xl  backdrop-blur-md ${
+          aslMode 
+            ? 'bg-red-500/80 text-white  hover:text-gray-300' 
+            : 'bg-black/10 text-gray-700  hover:text-gray-300'
+        }`}
+        
+      >
+        <span className="text-base">ASL</span>
+      </button>
 
       {!loaded && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a]/80 z-50 backdrop-blur-md">
