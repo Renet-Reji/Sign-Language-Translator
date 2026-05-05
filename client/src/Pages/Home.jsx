@@ -1,8 +1,19 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axiosInstance from '../Config/axiosInstance'
 
 export default function Home() {
     const navigate = useNavigate()
+
+    useEffect(() => {
+        axiosInstance({
+            method: 'get', 
+            url: '/'
+        })
+            .then((res) => {
+                console.log(res)
+            })
+    }, [])
 
     return (
         <div className="relative min-h-screen w-full bg-[#0a0a0a] text-white font-['Inter'] overflow-hidden flex flex-col items-center justify-center p-6 md:p-12">
