@@ -4,7 +4,7 @@ import pandas as pd
 from flask_cors import CORS
 
 app = Flask(__name__) 
-CORS(app)
+CORS(app, supports_credentials=True)
 
 model = joblib.load('./Model/asl_model4.pkl')
 encoder = joblib.load('./Model/label_encoder4.pkl')
